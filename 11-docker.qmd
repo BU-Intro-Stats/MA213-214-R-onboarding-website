@@ -135,11 +135,35 @@ Docker Desktop is available for some Linux distributions, but the installation s
 When Docker Desktop opens:
 
 1. Accept the terms when prompted.
-2. Sign in only if your course or organization requires it.
+2. Create a Docker account and sign in when prompted. This is required for the course image and helps avoid Docker Hub's lower anonymous pull limits.
 3. Leave the default resource settings unless you have a reason to change them.
 4. If Docker reports that a project folder cannot be mounted, open **Settings > Resources > File sharing** and share only the folder you need.
 
 Do not share your entire home directory unless you understand the privacy and security implications. Docker's [settings documentation](https://docs.docker.com/desktop/settings-and-maintenance/settings/) explains resource and file-sharing options.
+
+## Create a Docker Account and Sign In
+
+Before running the course image, create a free [Docker account](https://hub.docker.com/signup). You will need an email address and a Docker ID (username).
+
+1. Open the [Docker Hub sign-up page](https://hub.docker.com/signup).
+2. Create your account and verify your email address if Docker asks you to do so.
+3. Open Docker Desktop.
+4. Select **Sign in** or **Sign in / Create Docker ID** in the Docker Desktop menu.
+5. Complete the browser sign-in and return to Docker Desktop.
+
+You can confirm that the command line is authenticated by running:
+
+```bash
+docker login
+```
+
+Docker will display a browser-based sign-in flow. After authentication, try the image command again:
+
+```bash
+docker run --rm -it r-base
+```
+
+Public images may sometimes be pulled without signing in, but Docker Hub applies lower pull limits to anonymous users. Private course images always require an account with permission to access them. See Docker's [sign-in instructions](https://docs.docker.com/desktop/setup/sign-in/) and [image pull limits](https://docs.docker.com/docker-hub/usage/pulls/) for more information.
 
 ## Verify the Installation
 
