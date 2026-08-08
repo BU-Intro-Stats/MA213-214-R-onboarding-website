@@ -14,6 +14,7 @@ project:
     - 08-getting-results.qmd
     - 09-common-problems.qmd
     - 10-cheatsheet.qmd
+    - 11-docker.qmd
     - "!full-guide.qmd"
 
 website:
@@ -30,7 +31,7 @@ website:
         href: 01-rstudio.qmd
       - text: "2. Creating Your First R Script"
         href: 02-first-script.qmd
-      - text: "3. Rmarkdown and Quarto"
+      - text: "3. Rmarkdown and Quarto (optional)"
         href: 03-quarto-rmarkdown.qmd
       - text: "4. Running Code in RStudio"
         href: 04-running-code.qmd
@@ -46,6 +47,8 @@ website:
         href: 09-common-problems.qmd
       - text: "Quick Reference Cheat Sheet"
         href: 10-cheatsheet.qmd
+      - text: "11. Installing and Setting Up Docker"
+        href: 11-docker.qmd
 
 format:
   html:

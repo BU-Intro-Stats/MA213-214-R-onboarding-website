@@ -1,0 +1,186 @@
+# Installing and Setting Up Docker
+
+Docker lets you run software in a small, isolated environment called a **container**. A container can include a particular version of R, packages, and system libraries, which helps make an analysis reproducible across computers.
+
+Docker is optional for the basic R onboarding lessons. You should use it when your instructor, project, or lab instructions specifically ask you to.
+
+## Learning Objectives
+
+After completing this lesson, you should be able to:
+
+- Explain the difference between an image and a container.
+- Install Docker Desktop on Mac or Windows.
+- Check that Docker is running.
+- Run a simple R container.
+- Make a local project folder available inside a container.
+
+## Important Vocabulary
+
+| Term | Meaning |
+|---|---|
+| **Docker Desktop** | The application that runs Docker on Mac and Windows. |
+| **Image** | A packaged template used to create containers. |
+| **Container** | A running instance of an image. |
+| **Registry** | A service that stores and shares images, such as Docker Hub. |
+| **Volume or bind mount** | A way to make files persist or share a local folder with a container. |
+
+## Before You Install
+
+You will need:
+
+- Permission to install software on your computer.
+- An internet connection for the installer and the first image download.
+- Enough disk space for Docker Desktop and downloaded images.
+
+On a university-managed computer, installation may be restricted. Contact campus IT if you do not have permission to install or run virtualization software.
+
+## Install Docker Desktop
+
+Use Docker's official installation page:
+
+- [Docker Desktop download and overview](https://docs.docker.com/get-started/introduction/get-docker-desktop/)
+- [Mac installation instructions](https://docs.docker.com/desktop/setup/install/mac-install/)
+- [Windows installation instructions](https://docs.docker.com/desktop/setup/install/windows-install/)
+- [Linux installation instructions](https://docs.docker.com/desktop/setup/install/linux/)
+
+### Mac
+
+1. Download the installer for your Mac. Apple silicon Macs use the Apple silicon download; older Intel Macs use the Intel download.
+2. Open the downloaded `Docker.dmg` file.
+3. Drag Docker to the Applications folder.
+4. Open Docker from Applications and follow the first-run instructions.
+5. Wait until Docker Desktop reports that Docker is running.
+
+### Windows
+
+1. Download and run `Docker Desktop Installer.exe`.
+2. For most students, use the recommended per-user installation.
+3. Keep the WSL 2 option selected when the installer offers it, unless your IT department provides different instructions.
+4. Finish the installation and restart Windows if requested.
+5. Open Docker Desktop and wait until Docker is running.
+
+### Linux
+
+Docker Desktop is available for some Linux distributions, but the installation steps depend on the distribution. Follow Docker's current Linux instructions rather than copying commands for a different distribution.
+
+## First-Time Setup
+
+When Docker Desktop opens:
+
+1. Accept the terms when prompted.
+2. Sign in only if your course or organization requires it.
+3. Leave the default resource settings unless you have a reason to change them.
+4. If Docker reports that a project folder cannot be mounted, open **Settings > Resources > File sharing** and share only the folder you need.
+
+Do not share your entire home directory unless you understand the privacy and security implications. Docker's [settings documentation](https://docs.docker.com/desktop/settings-and-maintenance/settings/) explains resource and file-sharing options.
+
+## Verify the Installation
+
+Open Terminal on Mac/Linux or PowerShell on Windows and run:
+
+```bash
+docker --version
+docker version
+```
+
+Then run Docker's small test image:
+
+```bash
+docker run --rm hello-world
+```
+
+You should see a message explaining that the installation appears to be working. The `--rm` option removes the temporary container after it finishes.
+
+If the command says that it cannot connect to the Docker daemon, open Docker Desktop and wait for it to finish starting.
+
+## Run R in a Container
+
+Docker Hub provides an official `r-base` image. The following command downloads the image if necessary and opens an interactive R session:
+
+```bash
+docker run --rm -it r-base
+```
+
+At the R prompt, try:
+
+```r
+2 + 3
+version
+q()
+```
+
+When R asks whether to save the workspace, answer `n`. The container is temporary, so files created inside it disappear when it is removed.
+
+The [R Docker Official Image page](https://hub.docker.com/_/r-base/) contains the current image tags and usage examples.
+
+## Use a Local Project Folder
+
+To let a container read files from your current project folder, use a bind mount. In Terminal or PowerShell, first move into the folder containing your data or script, then run:
+
+```bash
+docker run --rm -it \
+  -v "$(pwd)":/work \
+  -w /work \
+  r-base
+```
+
+Inside R, check the mounted folder:
+
+```r
+getwd()
+list.files()
+```
+
+On Windows PowerShell, use `${PWD}` instead of `$(pwd)` if needed:
+
+```powershell
+docker run --rm -it -v "${PWD}:/work" -w /work r-base
+```
+
+The files stay on your computer because the local folder is mounted into the container. Changes made to those files can therefore be seen from RStudio on your computer.
+
+## Useful Commands
+
+| Goal | Command |
+|---|---|
+| List downloaded images | `docker image ls` |
+| List running containers | `docker container ls` |
+| List all containers | `docker container ls -a` |
+| Stop a running container | `docker stop CONTAINER_ID` |
+| Remove an unused container | `docker rm CONTAINER_ID` |
+| Download an image | `docker pull r-base` |
+| Show Docker help | `docker help` |
+
+Replace `CONTAINER_ID` with the ID shown by Docker. Be careful with commands that remove images, containers, or volumes because they can delete local data.
+
+## Common Problems
+
+### `docker: command not found`
+
+Docker Desktop may not be installed, or the terminal may have been open before installation. Install Docker Desktop, restart the terminal, and try again.
+
+### Cannot connect to the Docker daemon
+
+Start Docker Desktop and wait until it finishes loading. On Windows, also check that the WSL 2 feature is available and enabled if Docker Desktop is configured to use it.
+
+### Mounts denied or permission errors
+
+The folder may not be shared with Docker Desktop. Add only the project folder under **Settings > Resources > File sharing**, then try the command again.
+
+### The R image is slow to download
+
+The first download can take several minutes. Later runs reuse the downloaded image. Check your internet connection and available disk space.
+
+### Packages disappear after the container closes
+
+That is expected for a temporary container. Install packages in a Dockerfile or use a persistent image/volume when you need a repeatable project environment. Do not rely on an interactive container as your only copy of important work.
+
+## Summary
+
+The basic workflow is:
+
+1. Install and start Docker Desktop.
+2. Run `docker run --rm hello-world` to verify it.
+3. Run `docker run --rm -it r-base` to start R.
+4. Mount a project folder when the container needs access to local files.
+5. Keep important scripts and data on your computer or in version control.
