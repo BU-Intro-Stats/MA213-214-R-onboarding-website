@@ -241,6 +241,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#mac" id="toc-mac" class="nav-link" data-scroll-target="#mac">Mac</a></li>
   <li><a href="#windows" id="toc-windows" class="nav-link" data-scroll-target="#windows">Windows</a></li>
+  </ul></li>
+  <li><a href="#windows-virtualization-support-not-detected" id="toc-windows-virtualization-support-not-detected" class="nav-link" data-scroll-target="#windows-virtualization-support-not-detected">Windows: Virtualization Support Not Detected</a>
+  <ul class="collapse">
+  <li><a href="#check-whether-virtualization-is-enabled" id="toc-check-whether-virtualization-is-enabled" class="nav-link" data-scroll-target="#check-whether-virtualization-is-enabled">1. Check whether virtualization is enabled</a></li>
+  <li><a href="#install-or-update-wsl-2" id="toc-install-or-update-wsl-2" class="nav-link" data-scroll-target="#install-or-update-wsl-2">2. Install or update WSL 2</a></li>
+  <li><a href="#check-windows-features-manually" id="toc-check-windows-features-manually" class="nav-link" data-scroll-target="#check-windows-features-manually">3. Check Windows features manually</a></li>
+  <li><a href="#start-docker-with-the-wsl-2-backend" id="toc-start-docker-with-the-wsl-2-backend" class="nav-link" data-scroll-target="#start-docker-with-the-wsl-2-backend">4. Start Docker with the WSL 2 backend</a></li>
+  <li><a href="#if-the-computer-is-itself-a-virtual-machine" id="toc-if-the-computer-is-itself-a-virtual-machine" class="nav-link" data-scroll-target="#if-the-computer-is-itself-a-virtual-machine">5. If the computer is itself a virtual machine</a></li>
   <li><a href="#linux" id="toc-linux" class="nav-link" data-scroll-target="#linux">Linux</a></li>
   </ul></li>
   <li><a href="#first-time-setup" id="toc-first-time-setup" class="nav-link" data-scroll-target="#first-time-setup">First-Time Setup</a></li>
@@ -358,6 +366,59 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Open Docker Desktop and wait until Docker is running.</li>
 </ol>
 </section>
+</section>
+<section id="windows-virtualization-support-not-detected" class="level2">
+<h2 class="anchored" data-anchor-id="windows-virtualization-support-not-detected">Windows: Virtualization Support Not Detected</h2>
+<p>If Docker Desktop displays <strong>“Virtualization support not detected”</strong>, Docker cannot access the hardware or Windows virtualization features it needs to run Linux containers. This is a Windows computer configuration issue, not an R issue.</p>
+<section id="check-whether-virtualization-is-enabled" class="level3">
+<h3 class="anchored" data-anchor-id="check-whether-virtualization-is-enabled">1. Check whether virtualization is enabled</h3>
+<ol type="1">
+<li>Press <code>Ctrl + Shift + Esc</code> to open <strong>Task Manager</strong>.</li>
+<li>Select <strong>Performance &gt; CPU</strong>.</li>
+<li>Look for <strong>Virtualization</strong>.</li>
+</ol>
+<p>It should say <strong>Enabled</strong>. If it says <strong>Disabled</strong>, restart the computer and open the BIOS/UEFI setup screen. Enable the setting named something like <strong>Intel VT-x</strong>, <strong>Intel Virtualization Technology</strong>, <strong>AMD-V</strong>, or <strong>SVM Mode</strong>. The name and steps depend on the computer manufacturer.</p>
+<p>If the computer belongs to your school or employer and BIOS/UEFI settings are locked, contact IT. Do not change firmware settings unless you are comfortable doing so.</p>
+</section>
+<section id="install-or-update-wsl-2" class="level3">
+<h3 class="anchored" data-anchor-id="install-or-update-wsl-2">2. Install or update WSL 2</h3>
+<p>Open <strong>PowerShell as Administrator</strong> and run:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>wsl <span class="op">--</span>install</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>wsl <span class="op">--</span>update</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>wsl <span class="op">--</span>set-default-version <span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Restart Windows if prompted. On supported versions of Windows, <code>wsl --install</code> enables the Windows Subsystem for Linux and Virtual Machine Platform features and installs a default Linux distribution.</p>
+<p>Check the result with:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>wsl <span class="op">--</span>status</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>wsl <span class="op">--</span>version</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>If WSL is already installed, <code>wsl --update</code> may be all that is needed.</p>
+</section>
+<section id="check-windows-features-manually" class="level3">
+<h3 class="anchored" data-anchor-id="check-windows-features-manually">3. Check Windows features manually</h3>
+<p>If WSL installation does not work, open <strong>Turn Windows features on or off</strong> and make sure these features are selected:</p>
+<ul>
+<li><strong>Virtual Machine Platform</strong></li>
+<li><strong>Windows Subsystem for Linux</strong></li>
+</ul>
+<p>Restart Windows after making changes. If Docker is configured to use Hyper-V instead of WSL 2, the required Hyper-V features must also be enabled.</p>
+</section>
+<section id="start-docker-with-the-wsl-2-backend" class="level3">
+<h3 class="anchored" data-anchor-id="start-docker-with-the-wsl-2-backend">4. Start Docker with the WSL 2 backend</h3>
+<p>After restarting:</p>
+<ol type="1">
+<li>Open Docker Desktop.</li>
+<li>Open <strong>Settings &gt; General</strong>.</li>
+<li>Select <strong>Use the WSL 2 based engine</strong>, if that option is available.</li>
+<li>Select <strong>Apply</strong> and restart Docker Desktop.</li>
+</ol>
+<p>Docker recommends WSL 2 for most Windows installations. See <a href="https://docs.docker.com/desktop/features/wsl/">Docker’s WSL 2 instructions</a> and <a href="https://learn.microsoft.com/en-us/windows/wsl/install">Microsoft’s WSL installation guide</a> for current requirements.</p>
+</section>
+<section id="if-the-computer-is-itself-a-virtual-machine" class="level3">
+<h3 class="anchored" data-anchor-id="if-the-computer-is-itself-a-virtual-machine">5. If the computer is itself a virtual machine</h3>
+<p>If Windows is running inside VMware, VirtualBox, a university virtual desktop, or another virtual machine, the host must allow <strong>nested virtualization</strong>. You may not be able to enable this yourself. Contact the administrator of the virtual machine or campus IT.</p>
+<p>For additional checks, run:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>systeminfo</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Look near the bottom for the Hyper-V requirements. Docker’s <a href="https://docs.docker.com/desktop/setup/install/windows-install/">Windows installation requirements</a> and <a href="https://docs.docker.com/desktop/troubleshoot-and-support/troubleshoot/topics/">troubleshooting guide</a> describe the supported hardware and virtualization settings.</p>
+</section>
 <section id="linux" class="level3">
 <h3 class="anchored" data-anchor-id="linux">Linux</h3>
 <p>Docker Desktop is available for some Linux distributions, but the installation steps depend on the distribution. Follow Docker’s current Linux instructions rather than copying commands for a different distribution.</p>
@@ -377,36 +438,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="verify-the-installation" class="level2">
 <h2 class="anchored" data-anchor-id="verify-the-installation">Verify the Installation</h2>
 <p>Open Terminal on Mac/Linux or PowerShell on Windows and run:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> <span class="at">--version</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> version</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> <span class="at">--version</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> version</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Then run Docker’s small test image:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> hello-world</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> hello-world</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>You should see a message explaining that the installation appears to be working. The <code>--rm</code> option removes the temporary container after it finishes.</p>
 <p>If the command says that it cannot connect to the Docker daemon, open Docker Desktop and wait for it to finish starting.</p>
 </section>
 <section id="run-r-in-a-container" class="level2">
 <h2 class="anchored" data-anchor-id="run-r-in-a-container">Run R in a Container</h2>
 <p>Docker Hub provides an official <code>r-base</code> image. The following command downloads the image if necessary and opens an interactive R session:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-it</span> r-base</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-it</span> r-base</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>At the R prompt, try:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span> <span class="sc">+</span> <span class="dv">3</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>version</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">q</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span> <span class="sc">+</span> <span class="dv">3</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>version</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">q</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>When R asks whether to save the workspace, answer <code>n</code>. The container is temporary, so files created inside it disappear when it is removed.</p>
 <p>The <a href="https://hub.docker.com/_/r-base/">R Docker Official Image page</a> contains the current image tags and usage examples.</p>
 </section>
 <section id="use-a-local-project-folder" class="level2">
 <h2 class="anchored" data-anchor-id="use-a-local-project-folder">Use a Local Project Folder</h2>
 <p>To let a container read files from your current project folder, use a bind mount. In Terminal or PowerShell, first move into the folder containing your data or script, then run:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-it</span> <span class="dt">\</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">"</span>:/work <span class="dt">\</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-w</span> /work <span class="dt">\</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  r-base</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-it</span> <span class="dt">\</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">"</span>:/work <span class="dt">\</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-w</span> /work <span class="dt">\</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  r-base</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Inside R, check the mounted folder:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">getwd</span>()</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">list.files</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">getwd</span>()</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">list.files</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>On Windows PowerShell, use <code>${PWD}</code> instead of <code>$(pwd)</code> if needed:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>docker run <span class="op">--</span>rm <span class="op">-</span>it <span class="op">-</span>v <span class="st">"</span><span class="pp">${</span><span class="va">PWD</span><span class="pp">}</span><span class="st">:/work"</span> <span class="op">-</span>w <span class="op">/</span>work r-base</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>docker run <span class="op">--</span>rm <span class="op">-</span>it <span class="op">-</span>v <span class="st">"</span><span class="pp">${</span><span class="va">PWD</span><span class="pp">}</span><span class="st">:/work"</span> <span class="op">-</span>w <span class="op">/</span>work r-base</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The files stay on your computer because the local folder is mounted into the container. Changes made to those files can therefore be seen from RStudio on your computer.</p>
 </section>
 <section id="useful-commands" class="level2">

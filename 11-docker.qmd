@@ -59,6 +59,73 @@ Use Docker's official installation page:
 4. Finish the installation and restart Windows if requested.
 5. Open Docker Desktop and wait until Docker is running.
 
+## Windows: Virtualization Support Not Detected
+
+If Docker Desktop displays **“Virtualization support not detected”**, Docker cannot access the hardware or Windows virtualization features it needs to run Linux containers. This is a Windows computer configuration issue, not an R issue.
+
+### 1. Check whether virtualization is enabled
+
+1. Press `Ctrl + Shift + Esc` to open **Task Manager**.
+2. Select **Performance > CPU**.
+3. Look for **Virtualization**.
+
+It should say **Enabled**. If it says **Disabled**, restart the computer and open the BIOS/UEFI setup screen. Enable the setting named something like **Intel VT-x**, **Intel Virtualization Technology**, **AMD-V**, or **SVM Mode**. The name and steps depend on the computer manufacturer.
+
+If the computer belongs to your school or employer and BIOS/UEFI settings are locked, contact IT. Do not change firmware settings unless you are comfortable doing so.
+
+### 2. Install or update WSL 2
+
+Open **PowerShell as Administrator** and run:
+
+```powershell
+wsl --install
+wsl --update
+wsl --set-default-version 2
+```
+
+Restart Windows if prompted. On supported versions of Windows, `wsl --install` enables the Windows Subsystem for Linux and Virtual Machine Platform features and installs a default Linux distribution.
+
+Check the result with:
+
+```powershell
+wsl --status
+wsl --version
+```
+
+If WSL is already installed, `wsl --update` may be all that is needed.
+
+### 3. Check Windows features manually
+
+If WSL installation does not work, open **Turn Windows features on or off** and make sure these features are selected:
+
+- **Virtual Machine Platform**
+- **Windows Subsystem for Linux**
+
+Restart Windows after making changes. If Docker is configured to use Hyper-V instead of WSL 2, the required Hyper-V features must also be enabled.
+
+### 4. Start Docker with the WSL 2 backend
+
+After restarting:
+
+1. Open Docker Desktop.
+2. Open **Settings > General**.
+3. Select **Use the WSL 2 based engine**, if that option is available.
+4. Select **Apply** and restart Docker Desktop.
+
+Docker recommends WSL 2 for most Windows installations. See [Docker's WSL 2 instructions](https://docs.docker.com/desktop/features/wsl/) and [Microsoft's WSL installation guide](https://learn.microsoft.com/en-us/windows/wsl/install) for current requirements.
+
+### 5. If the computer is itself a virtual machine
+
+If Windows is running inside VMware, VirtualBox, a university virtual desktop, or another virtual machine, the host must allow **nested virtualization**. You may not be able to enable this yourself. Contact the administrator of the virtual machine or campus IT.
+
+For additional checks, run:
+
+```powershell
+systeminfo
+```
+
+Look near the bottom for the Hyper-V requirements. Docker's [Windows installation requirements](https://docs.docker.com/desktop/setup/install/windows-install/) and [troubleshooting guide](https://docs.docker.com/desktop/troubleshoot-and-support/troubleshoot/topics/) describe the supported hardware and virtualization settings.
+
 ### Linux
 
 Docker Desktop is available for some Linux distributions, but the installation steps depend on the distribution. Follow Docker's current Linux instructions rather than copying commands for a different distribution.
