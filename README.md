@@ -6,7 +6,7 @@ The guide assumes no previous programming experience and introduces students to 
 
 ## Website
 
-[Open the published R Onboarding Guide](https://bu-intro-stats.github.io/R_Onboarding/)
+[Open the published R Onboarding Guide](https://bu-intro-stats.github.io/MA213-214-R-onboarding-website/)
 
 ## Lessons
 
